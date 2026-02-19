@@ -1,0 +1,12 @@
+{
+    "watch": [
+        "server.js",
+        ".env"
+    ],
+    "ignore": [
+        "client/*",
+        "vite.config.js.timestamp-*",
+        "dist/*"
+    ],
+    "ext": "js,json"
+}

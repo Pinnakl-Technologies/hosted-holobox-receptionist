@@ -1,0 +1,54 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19
+
+      - name: Install deps
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Clone target repo
+        run: |
+          git clone https://x-access-token:${{ secrets.UMAR_ANZAR_DEPLOY_TOKEN }}@github.com/Pinnakl-Technologies/hosted-holobox-ai-avatar.git deploy-repo
+
+      # Clear old build content but keep .git
+      - name: Clean deploy repo
+        run: |
+          rm -rf deploy-repo/client/dist/*
+          rm -rf deploy-repo/api/*
+
+      # Copy build + API into Repo B
+      - name: Copy files
+        run: |
+          mkdir -p deploy-repo/client/dist
+          mkdir -p deploy-repo/api
+          cp -r client/dist/* deploy-repo/client/dist/
+          cp -r api/* deploy-repo/api/
+          cp vercel.json deploy-repo/vercel.json
+          cp constants/* deploy-repo/constants
+
+      - name: Push to target repo
+        run: |
+          cd deploy-repo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Deploy from Repo A $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push
+

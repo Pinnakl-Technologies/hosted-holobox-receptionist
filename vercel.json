@@ -1,0 +1,9 @@
+{
+    "outputDirectory": "client/dist",
+    "rewrites": [
+        {
+            "source": "/token",
+            "destination": "/api/token"
+        }
+    ]
+}
